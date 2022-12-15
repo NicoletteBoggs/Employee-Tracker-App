@@ -50,3 +50,25 @@ const initprompt = () => {
       }
     });
 };
+
+function viewDepartments() {
+  db.query(`SELECT * FROM departments`, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    initprompt();
+  });
+}
+function viewRoles() {
+  db.query(`SELECT * FROM roles`, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    initprompt();
+  });
+}
+function viewEmployees() {
+  db.query(`SELECT * FROM employees`, function (err, res) {
+    if (err) throw err;
+    console.table(res);
+    initprompt();
+  });
+}
