@@ -42,7 +42,7 @@ const initprompt = () => {
           addEmployee();
           break;
         case "Update employee role":
-          updateRole();
+          updateEmployee();
           break;
         case "Quit":
           Quit();
@@ -50,6 +50,52 @@ const initprompt = () => {
       }
     });
 };
+// in order to update an employee role we need to select the emplyee who's role we want to change and then select the role we're assigning them
+// take answers and use as parameters on update query for employee table
+function updateEmployee() {
+  db.query("SELECT * FROM employees", function (err, res) {
+    if (err) throw err;
+    inquirer
+      .prompt([
+        {
+          type: "list",
+          name: "Employee",
+          message: "Select the employee who is changing roles",
+          choices: res.map((employee) => employee.first_name),
+        },
+      ])
+      .then(function (answer) {
+        const Employee = res.find(
+          (employee) => employee.first_name === answer.Employee
+        );
+        db.query("SELECT * FROM roles", function (err, res) {
+          inquirer
+            .prompt([
+              {
+                type: "list",
+                name: "updateRole",
+                message: "Select the new role for this employee",
+                choices: res.map((role) => role.title),
+              },
+            ])
+            .then(function (answer) {
+              const selectedRole = res.find(
+                (role) => role.title === answer.updateRole
+              );
+              db.query(
+                "UPDATE employees SET role_id = ? WHERE id = ?",
+                [selectedRole.id, Employee.id],
+                function (error) {
+                  if (error) throw err;
+                  initprompt();
+                }
+              );
+            });
+        });
+      });
+  });
+}
+
 // view querys grab table from database and console .table it in our terminal
 function viewDepartments() {
   db.query(`SELECT * FROM departments`, function (err, res) {
@@ -175,3 +221,5 @@ function addEmployee() {
       });
   });
 }
+
+initprompt();
